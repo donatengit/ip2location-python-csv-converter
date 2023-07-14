@@ -31,10 +31,7 @@ if not hasattr(socket, 'inet_pton'):
 
 def no2ip(iplong):
     if (int(iplong) > 4294967295):
-        if sys.version < '3':
-            return ipaddress.ip_address(long(iplong)).__str__()
-        else:
-            return ipaddress.ip_address(int(iplong)).__str__()
+        return ipaddress.ip_address(int(iplong)).__str__()
     else:
         return (socket.inet_ntoa(struct.pack('!I', int(iplong))))
 
@@ -65,7 +62,7 @@ if (len(sys.argv) > 2):
         output_file = sys.argv[4]
     
     if ((os.path.isfile(input_file)) is False):
-            print ("File doesn't exist! Please check again.")
+            print (f"File {input_file} doesn't exist! Please check number of arguments.")
             sys.exit(1)
     else:
         if (check_data_validity(input_file)  is False):
