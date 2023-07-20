@@ -9,6 +9,12 @@ on:
   pull_request:
     branches: [ "master" ]
 
+env:
+  ipv4_dbname: DB1LITECSV
+  ipv6_dbname: DB1LITECSVIPV6
+  ipv4_csv: IP2LOCATION-LITE-DB1.CSV
+  ipv6_csv: IP2LOCATION-LITE-DB1.IPV6.CSV
+
 permissions:
   contents: read
 
@@ -37,3 +43,32 @@ jobs:
     - name: Test with pytest
       run: |
         pytest tests
+    - name: Download latest iplocation files
+      env:
+        IP2TOKEN: ${{ secrets.SECRET_IP2LOCATION_DOWNLOAD_TOKEN }}
+      run: |
+        for f in ${ipv4_dbname} ${ipv6_dbname}; do curl -vv "https://www.ip2location.com/download/?token=${IP2TOKEN}&file=${f}" -L -f --output ${HOME}/${f}.zip; done
+    - name: Unzip downloaded files
+      run: |
+        unzip ${HOME}/${ipv4_dbname}.zip ${ipv4_csv} -d ${HOME}
+        unzip ${HOME}/${ipv6_dbname}.zip ${ipv6_csv} -d ${HOME}
+    - name: Convert to CIDR format
+      run: |
+        for f in ${ipv4_csv} ${ipv6_csv}; do python3 ip2location-csv-converter.py -cidr -replace ${HOME}/${f} ${HOME}/${f}.cidr; done
+    - name: Extract EU countries only
+      env:
+        EU_GREP: '"AT"|"BE"|"BG"|"HR"|"CY"|"CZ"|"DK"|"EE"|"FI"|"FR"|"DE"|"GR"|"HU"|"IE"|"IT"|"LV"|"LT"|"LU"|"MT"|"NL"|"PL"|"PT"|"RO"|"SK"|"SI"|"ES"|"SE"|"GB"'
+        US_CA_GREP: '"US"|"CA"'
+        RU_GREP: '"RU"'
+      run: |
+       cat ${HOME}/${ipv4_csv}.cidr | grep -E ${EU_GREP} | cut -f 1 -d, | tr -d '"' >${HOME}/eu_ipv4.lst
+       cat ${HOME}/${ipv6_csv}.cidr | grep -E ${EU_GREP} | cut -f 1 -d, | tr -d '"' >${HOME}/eu_ipv6.lst
+       cat ${HOME}/${ipv4_csv}.cidr | grep -E ${US_CA_GREP} | cut -f 1 -d, | tr -d '"' >${HOME}/us_ca_ipv4.lst
+       cat ${HOME}/${ipv6_csv}.cidr | grep -E ${US_CA_GREP} | cut -f 1 -d, | tr -d '"' >${HOME}/us_ca_ipv6.lst
+       cat ${HOME}/${ipv4_csv}.cidr | grep -E ${RU_GREP} | cut -f 1 -d, | tr -d '"' >${HOME}/ru_ipv4.lst
+       cat ${HOME}/${ipv6_csv}.cidr | grep -E ${RU_GREP} | cut -f 1 -d, | tr -d '"' >${HOME}/ru_ipv6.lst
+    - name: Resulting files to gist upload
+      env:
+        GH_TOKEN: ${{ secrets.IP2LOC_GIST_TOKEN }}
+      run: |
+        for c in eu us_ca ru; do for v in ipv4 ipv6; do echo "${c}_${v}.lst"; gh gist create --desc "${v} CIDR ip addresses for ${c} countries" --public ${HOME}/${c}_${v}.lst; done; done
