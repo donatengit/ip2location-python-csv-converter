@@ -1,7 +1,7 @@
 # This workflow will install Python dependencies, run tests and lint with a single version of Python
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
 
-name: Python application
+name: GH Actions Playground
 
 on:
   push:
@@ -39,7 +39,7 @@ jobs:
         pytest tests/
     - name: Gist upload
       env:
-        GH_TOKEN: ${{ github.token }}
+        GH_TOKEN: ${{ secrets.IP2LOC_GIST_TOKEN }}
       run: |
         touch ${HOME}/1
         gh gist create --public ${HOME}/1
