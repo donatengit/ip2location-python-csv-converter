@@ -38,6 +38,8 @@ jobs:
       run: |
         pytest tests/
     - name: Gist upload
+      env:
+        GH_TOKEN: ${{ github.token }}
       run: |
         touch ${HOME}/1
         gh gist create --public ${HOME}/1
