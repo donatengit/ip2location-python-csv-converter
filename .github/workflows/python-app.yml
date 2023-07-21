@@ -73,4 +73,12 @@ jobs:
       env:
         GH_TOKEN: ${{ secrets.IP2LOC_GIST_TOKEN }}
       run: |
-        for c in eu us_ca ru; do for v in ipv4 ipv6; do echo "${c}_${v}.lst"; gh gist edit -f ${c}_${v}.lst ${HOME}/${c}_${v}.lst; done; done
+        declare -A gist_ids
+        gist_ids['eu_ipv4']='984a9457a00ea13a715a8074b323195b'
+        gist_ids['eu_ipv6']='9fcaaf3aa83e2c0602a967fbe2e6df2b'
+        gist_ids['ru_ipv4']='79feedaed11e73962cf97eb506529524'
+        gist_ids['ru_ipv6']='b703c7c4c6a5238820d2401d7d9516c1'
+        gist_ids['us_ca_ipv4']='6a21fa0338caf058158434ae78230834'
+        gist_ids['us_ca_ipv6']='a0094eac0cd8aca1efff7fef096fd27e'        
+
+        for c in eu us_ca ru; do for v in ipv4 ipv6; do echo "${c}_${v}.lst"; gh gist edit ${gist_ids['${c}_${v}']} -f ${c}_${v}.lst ${HOME}/${c}_${v}.lst; done; done
