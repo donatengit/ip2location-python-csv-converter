@@ -8,6 +8,8 @@ on:
     branches: [ "master" ]
   pull_request:
     branches: [ "master" ]
+  schedule:
+    - cron: "37 3 * * 2"
 
 env:
   ipv4_dbname: DB1LITECSV
@@ -47,7 +49,7 @@ jobs:
       env:
         IP2TOKEN: ${{ secrets.SECRET_IP2LOCATION_DOWNLOAD_TOKEN }}
       run: |
-        for f in ${ipv4_dbname} ${ipv6_dbname}; do curl -vv "https://www.ip2location.com/download/?token=${IP2TOKEN}&file=${f}" -L -f --output ${HOME}/${f}.zip; done
+        for f in ${ipv4_dbname} ${ipv6_dbname}; do curl -v "https://www.ip2location.com/download/?token=${IP2TOKEN}&file=${f}" -L -f --output ${HOME}/${f}.zip; done
     - name: Unzip downloaded files
       run: |
         unzip ${HOME}/${ipv4_dbname}.zip ${ipv4_csv} -d ${HOME}
