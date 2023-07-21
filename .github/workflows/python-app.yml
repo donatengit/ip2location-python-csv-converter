@@ -73,4 +73,4 @@ jobs:
       env:
         GH_TOKEN: ${{ secrets.IP2LOC_GIST_TOKEN }}
       run: |
-        for c in eu us_ca ru; do for v in ipv4 ipv6; do echo "${c}_${v}.lst"; gh gist create --desc "${v} CIDR ip addresses for ${c} countries" --public ${HOME}/${c}_${v}.lst; done; done
+        for c in eu us_ca ru; do for v in ipv4 ipv6; do echo "${c}_${v}.lst"; gh gist edit -f ${c}_${v}.lst ${HOME}/${c}_${v}.lst; done; done
