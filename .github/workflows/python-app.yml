@@ -69,6 +69,11 @@ jobs:
        cat ${HOME}/${ipv6_csv}.cidr | grep -E ${US_CA_GREP} | cut -f 1 -d, | tr -d '"' >${HOME}/us_ca_ipv6.lst
        cat ${HOME}/${ipv4_csv}.cidr | grep -E ${RU_GREP} | cut -f 1 -d, | tr -d '"' >${HOME}/ru_ipv4.lst
        cat ${HOME}/${ipv6_csv}.cidr | grep -E ${RU_GREP} | cut -f 1 -d, | tr -d '"' >${HOME}/ru_ipv6.lst
+    - name: GH Version
+      env:
+        GH_TOKEN: ${{ secrets.IP2LOC_GIST_TOKEN }}
+      run: |
+        gh --version
     - name: Resulting files to gist upload
       env:
         GH_TOKEN: ${{ secrets.IP2LOC_GIST_TOKEN }}
@@ -81,4 +86,9 @@ jobs:
         gist_ids['us_ca_ipv4']='6a21fa0338caf058158434ae78230834'
         gist_ids['us_ca_ipv6']='a0094eac0cd8aca1efff7fef096fd27e'        
 
-        for c in eu us_ca ru; do for v in ipv4 ipv6; do echo "${c}_${v}.lst -> ${gist_ids['${c}_${v}']}"; gh gist edit ${gist_ids['${c}_${v}']} ${HOME}/${c}_${v}.lst; done; done
+        for c in eu us_ca ru; do for v in ipv4 ipv6
+        do
+          content=$(<${HOME}/${c}_${v}.lst)
+          curl -d '{"files":{"${c}_${v}.lst":{"content":"${content}"}}}' -u donateni:${GH_TOKEN} -X PATCH https://api.github.com/gists/${gist_ids[${c}_${v}]}
+          # echo "${c}_${v}.lst -> ${gist_ids[${c}_${v}]}"; gh gist edit ${gist_ids[${c}_${v}]} -f ${c}_${v}.lst ${HOME}/${c}_${v}.lst;
+        done; done
