@@ -42,4 +42,4 @@ jobs:
         GH_TOKEN: ${{ secrets.IP2LOC_GIST_TOKEN }}
       run: |
         echo Hello_world >${HOME}/hello_world
-        gh gist create --public ${HOME}/hello_world
+#        gh gist create --public ${HOME}/hello_world
