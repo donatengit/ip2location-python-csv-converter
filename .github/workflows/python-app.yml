@@ -84,5 +84,5 @@ jobs:
 
         for c in eu us_ca ru; do for v in ipv4 ipv6
         do
-          python3 ${HOME}/gist_upload.py ${gist_id} {c}_{v}.lst ${HOME}/{c}_{v}.lst
+          python3 ${HOME}/gist_upload.py ${gist_id} ${c}_${v}.lst ${HOME}/${c}_${v}.lst
         done; done
