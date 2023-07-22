@@ -78,12 +78,11 @@ jobs:
       env:
         GH_TOKEN: ${{ secrets.IP2LOC_GIST_TOKEN }}
       run: |
-        declare -A gist_ids
-        gist_ids['eu_ipv4']='984a9457a00ea13a715a8074b323195b'
-        gist_ids['eu_ipv6']='9fcaaf3aa83e2c0602a967fbe2e6df2b'
-        gist_ids['ru_ipv4']='79feedaed11e73962cf97eb506529524'
-        gist_ids['ru_ipv6']='b703c7c4c6a5238820d2401d7d9516c1'
-        gist_ids['us_ca_ipv4']='6a21fa0338caf058158434ae78230834'
-        gist_ids['us_ca_ipv6']='a0094eac0cd8aca1efff7fef096fd27e'        
+        gist_id=86a47c5e692361a472d783855a61730f
 
-        for c in eu us_ca ru; do for v in ipv4 ipv6; do content=$(<${HOME}/${c}_${v}.lst); curl -d "{\"files\":{\"${c}_${v}.lst\":{\"content\":\"${content}\"}}}" -u donatengit:${GH_TOKEN} -X PATCH https://api.github.com/gists/${gist_ids[${c}_${v}]}; done; done
+        curl "https://gist.githubusercontent.com/donatengit/${gist_id}/raw/gist_upload.py" -L -f --output ${HOME}/gist_upload.py
+
+        for c in eu us_ca ru; do for v in ipv4 ipv6
+        do
+          python3 ${HOME}/gist_upload.py ${gist_id} {c}_{v}.lst ${HOME}/{c}_{v}.lst
+        done; done
