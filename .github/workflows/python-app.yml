@@ -1,7 +1,7 @@
 # This workflow will install Python dependencies, run tests and lint with a single version of Python
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
 
-name: Python application
+name: Download merge and upload to GIST
 
 on:
   push:
@@ -67,8 +67,34 @@ jobs:
        cat ${HOME}/${ipv6_csv}.cidr | grep -E ${EU_GREP} | cut -f 1 -d, | tr -d '"' >${HOME}/eu_ipv6.lst
        cat ${HOME}/${ipv4_csv}.cidr | grep -E ${US_CA_GREP} | cut -f 1 -d, | tr -d '"' >${HOME}/us_ca_ipv4.lst
        cat ${HOME}/${ipv6_csv}.cidr | grep -E ${US_CA_GREP} | cut -f 1 -d, | tr -d '"' >${HOME}/us_ca_ipv6.lst
-       cat ${HOME}/${ipv4_csv}.cidr | grep -E ${RU_GREP} | cut -f 1 -d, | tr -d '"' >${HOME}/ru_ipv4.lst
-       cat ${HOME}/${ipv6_csv}.cidr | grep -E ${RU_GREP} | cut -f 1 -d, | tr -d '"' >${HOME}/ru_ipv6.lst
+       cat ${HOME}/${ipv4_csv}.cidr | grep -E ${RU_GREP} | cut -f 1 -d, | tr -d '"' >${HOME}/ru_iplocation_ipv4.lst
+       cat ${HOME}/${ipv6_csv}.cidr | grep -E ${RU_GREP} | cut -f 1 -d, | tr -d '"' >${HOME}/ru_iplocation_ipv6.lst
+    - name: Download Yandex LLC ranges
+      run: |
+       curl -v "https://gist.githubusercontent.com/donatengit/6d26413409ddfb4168613272fe46eccd/raw" -L -f --output ${HOME}/ru_yandex_llc_ipv6.lst
+       curl -v "https://gist.githubusercontent.com/donatengit/af31c0ee18f42af16c41bfeb15afc6c6/raw" -L -f --output ${HOME}/ru_yandex_llc_ipv4.lst
+       stat ${HOME}/yandex_llc_ipv*
+    - name: Download latest MaxMind Country files
+      env:
+        MAXMIND_KEY: ${{ secrets.MAXMIND_GEOIP_COUNTRIES_KEY }}
+        MAXMIND_DB_ZIP: ${HOME}/maxmind_db.zip
+      run: |
+        curl -v "https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-Country-CSV&license_key=${MAXMIND_KEY}&suffix=zip" -L -f --output ${MAXMIND_DB_ZIP}
+        unzip -j -o ${MAXMIND_DB_ZIP} -d ${HOME}
+        maxmind_loc_id=`cat ${HOME}/GeoLite2-Country-Locations-en.csv | grep ,RU, | cut -d, -f 1`
+        echo ${maxmind_loc_id}
+        stat ${HOME}/GeoLite2*
+        cat ${HOME}/GeoLite2-Country-Blocks-IPv4.csv | grep ",$maxmind_loc_id," | cut -f 1 -d, >${HOME}/ru_maxmind_ipv4.lst
+        cat ${HOME}/GeoLite2-Country-Blocks-IPv6.csv | grep ",$maxmind_loc_id," | cut -f 1 -d, >${HOME}/ru_maxmind_ipv6.lst
+    - name: Merge all RU cidr sources
+      env:
+        MAXMIND_KEY: ${{ secrets.MAXMIND_GEOIP_COUNTRIES_KEY }}
+        MAXMIND_DB_ZIP: ${HOME}/maxmind_db.zip
+      run: |
+        for f in `ls ${HOME}/ru*`; do echo $f; wc -l $f; done
+        python3 ip_cidr_merge.py ${HOME}/ru_ipv4.lst ${HOME}/ru_iplocation_ipv4.lst ${HOME}/ru_yandex_llc_ipv4.lst ${HOME}/ru_maxmind_ipv4.lst
+        python3 ip_cidr_merge.py ${HOME}/ru_ipv6.lst ${HOME}/ru_iplocation_ipv6.lst ${HOME}/ru_yandex_llc_ipv6.lst ${HOME}/ru_maxmind_ipv6.lst
+        wc -l ${HOME}/ru_ipv{4,6}.lst
     - name: GH Version
       env:
         GH_TOKEN: ${{ secrets.IP2LOC_GIST_TOKEN }}
