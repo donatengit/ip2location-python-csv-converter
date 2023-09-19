@@ -69,13 +69,6 @@ jobs:
        cat ${HOME}/${ipv6_csv}.cidr | grep -E ${US_CA_GREP} | cut -f 1 -d, | tr -d '"' >${HOME}/us_ca_ipv6.lst
        cat ${HOME}/${ipv4_csv}.cidr | grep -E ${RU_GREP} | cut -f 1 -d, | tr -d '"' >${HOME}/ru_ipv4.lst
        cat ${HOME}/${ipv6_csv}.cidr | grep -E ${RU_GREP} | cut -f 1 -d, | tr -d '"' >${HOME}/ru_ipv6.lst
-    - name: Forcibly add Yandex LLC to RU ranges 
-      run: |
-       curl -v "https://gist.githubusercontent.com/donatengit/6d26413409ddfb4168613272fe46eccd/raw" -L -f --output ${HOME}/yandex_llc_ipv6.lst
-       curl -v "https://gist.githubusercontent.com/donatengit/af31c0ee18f42af16c41bfeb15afc6c6/raw" -L -f --output ${HOME}/yandex_llc_ipv4.lst
-       stat ${HOME}/yandex_llc_ipv*
-       cat ${HOME}/yandex_llc_ipv4.lst | grep -v '^$' >>${HOME}/ru_ipv4.lst
-       cat ${HOME}/yandex_llc_ipv6.lst | grep -v '^$' >>${HOME}/ru_ipv6.lst
     - name: GH Version
       env:
         GH_TOKEN: ${{ secrets.IP2LOC_GIST_TOKEN }}
