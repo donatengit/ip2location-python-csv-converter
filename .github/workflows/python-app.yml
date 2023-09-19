@@ -73,7 +73,7 @@ jobs:
       run: |
        curl -v "https://gist.githubusercontent.com/donatengit/6d26413409ddfb4168613272fe46eccd/raw" -L -f --output ${HOME}/ru_yandex_llc_ipv6.lst
        curl -v "https://gist.githubusercontent.com/donatengit/af31c0ee18f42af16c41bfeb15afc6c6/raw" -L -f --output ${HOME}/ru_yandex_llc_ipv4.lst
-       stat ${HOME}/yandex_llc_ipv*
+       stat ${HOME}/ru_yandex_llc_ipv*
     - name: Download latest MaxMind Country files
       env:
         MAXMIND_KEY: ${{ secrets.MAXMIND_GEOIP_COUNTRIES_KEY }}
