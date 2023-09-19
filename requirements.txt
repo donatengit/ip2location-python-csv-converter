@@ -1,3 +1,4 @@
 ipaddress
 pytest
 requests
+netaddr
