@@ -93,7 +93,7 @@ jobs:
         for f in `ls ${HOME}/ru*`; do echo $f; wc -l $f; done
         python3 ip_cidr_merge.py ${HOME}/ru_ipv4.lst ${HOME}/ru_iplocation_ipv4.lst ${HOME}/ru_yandex_llc_ipv4.lst ${HOME}/ru_maxmind_ipv4.lst
         python3 ip_cidr_merge.py ${HOME}/ru_ipv6.lst ${HOME}/ru_iplocation_ipv6.lst ${HOME}/ru_yandex_llc_ipv6.lst ${HOME}/ru_maxmind_ipv6.lst
-        wc -l ${HOME}/ru_ipv{4,6}.lst
+        for f in `ls ${HOME}/ru*`; do echo $f; wc -l $f; done
     - name: GH Version
       env:
         GH_TOKEN: ${{ secrets.IP2LOC_GIST_TOKEN }}
