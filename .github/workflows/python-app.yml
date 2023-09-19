@@ -77,10 +77,9 @@ jobs:
     - name: Download latest MaxMind Country files
       env:
         MAXMIND_KEY: ${{ secrets.MAXMIND_GEOIP_COUNTRIES_KEY }}
-        MAXMIND_DB_ZIP: ${HOME}/maxmind_db.zip
       run: |
-        curl -v "https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-Country-CSV&license_key=${MAXMIND_KEY}&suffix=zip" -L -f --output ${MAXMIND_DB_ZIP}
-        unzip -j -o ${MAXMIND_DB_ZIP} -d ${HOME}
+        curl -v "https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-Country-CSV&license_key=${MAXMIND_KEY}&suffix=zip" -L -f --output ${HOME}/maxmind_db.zip
+        unzip -j -o ${HOME}/maxmind_db.zip -d ${HOME}
         maxmind_loc_id=`cat ${HOME}/GeoLite2-Country-Locations-en.csv | grep ,RU, | cut -d, -f 1`
         echo ${maxmind_loc_id}
         stat ${HOME}/GeoLite2*
