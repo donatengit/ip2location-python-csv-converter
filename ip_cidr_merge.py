@@ -3,7 +3,7 @@ from netaddr import IPNetwork, IPSet, IPAddress
 
 script_name = os.path.basename(sys.argv[0])
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 log = logging.getLogger(script_name)
 
 if len(sys.argv) < 3:
@@ -28,13 +28,13 @@ for f in range(2, len(sys.argv)):
                     ip_ranges |= IPAddress(ip_range_or_address)
             except Exception as oe:
                 log.warning(f"Exception on reading/parsing ({oe}) on line '{ip_range_or_address}', skipping")
-log.info(f"Read {len(ip_ranges)} IP addresses. Merging...")
+#log.info(f"Read {len(ip_ranges)} IP addresses. Merging...")
 
 # ip_ranges.compact()
 
-log.debug(f"Resulting ip ranges: {ip_ranges}")
+log.info(f"Resulting ip ranges: {ip_ranges}")
 
-log.info(f"{len(ip_ranges)} IP addresses after merge. Writing...")
+#log.info(f"{len(ip_ranges)} IP addresses after merge. Writing...")
 
 for cidr in ip_ranges.iter_cidrs():
     output_file.write(f"{cidr}\n")
